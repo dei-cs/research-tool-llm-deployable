@@ -2,12 +2,22 @@ services:
   ollama:
     image: ollama/ollama:latest
     restart: unless-stopped
+    runtime: nvidia
     environment:
       - OLLAMA_HOST=0.0.0.0
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
     volumes:
       - ollama:/root/.ollama
     ports:
       - "127.0.0.1:11434:11434" # bind to localhost so it's not public
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
 
   api:
     build: .
